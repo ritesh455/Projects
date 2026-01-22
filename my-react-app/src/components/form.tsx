@@ -183,7 +183,7 @@ const Form: React.FC<FormProps> = ({ resume, setResume }) => {
                 }
               />
               <input
-                placeholder="End Year"
+                placeholder="End Year-"
                 value={edu.endYear}
                 onChange={(e) =>
                   updateEducation(edu.id, "endYear", e.target.value)

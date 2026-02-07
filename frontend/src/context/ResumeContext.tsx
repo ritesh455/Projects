@@ -1,10 +1,16 @@
 import React, { createContext, useContext, useState } from "react";
-import type { ResumeData } from "../types/ResumeTypes";
+import type {  ResumeData, Education, Experience } from "../types/ResumeTypes";
 
 const initialResume: ResumeData = {
-  name: "",
-  email: "",
-  phone: "",
+  personalInfo: {
+    fullName: "",
+    email: "",
+    phone: "",
+    location: "",
+    website: "",
+    linkedin: "",
+    summary: "",
+  },
   education: [],
   experience: [],
   skills: [],

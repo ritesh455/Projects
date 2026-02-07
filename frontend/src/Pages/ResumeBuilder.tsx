@@ -7,8 +7,8 @@ export default function ResumeBuilder() {
   const { addEducation, addExperience } = useResume();
 
   return (
-    <div className="grid grid-cols-2 gap-6 p-6">
-      <div>
+    <div className="grid grid-cols-2 gap-6 p-6 items-start">
+  <div style={{ maxHeight: 'calc(100vh - 48px)', overflow: 'auto', paddingRight: '1rem' }}>
         <PersonalInfoForm />
         <div className="mt-6">
           <h2 className="font-semibold mb-2">Education</h2>
@@ -33,7 +33,11 @@ export default function ResumeBuilder() {
         </div>
       </div>
 
-      <ResumePreview />
+      <div className="self-start">
+        <div className="sticky top-6">
+          <ResumePreview />
+        </div>
+      </div>
     </div>
   );
 }

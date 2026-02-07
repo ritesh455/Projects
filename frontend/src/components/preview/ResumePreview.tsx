@@ -6,7 +6,7 @@ export default function ResumePreview() {
   const p = resume.personalInfo;
 
   return (
-    <div className="p-6 bg-white shadow">
+  <div className="p-6 bg-white shadow overflow-visible">
       <h1 className="text-2xl font-bold">{p.fullName || "Your Name"}</h1>
       <p className="text-sm text-gray-600">
         {p.email} {p.email && p.phone ? " | " : ""} {p.phone}

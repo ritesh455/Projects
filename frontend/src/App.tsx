@@ -10,6 +10,7 @@ import About from "./Pages/About";
 import PublicLayout from "./layouts/PublicLayout";
 import ProtectedRoute from "./Pages/ProtectedRoute";
 import PrivateLayout from "./layouts/PrivateLayout";
+import GuestRoute from "./Pages/GuestRoute";
 
 function App() {
   return (
@@ -23,8 +24,28 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              {/* <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} /> */}
+            {/* </Route> */}
+
+            
+              {/* 🚫 Login/Register blocked for logged-in users */}
+              <Route
+                path="/login"
+                element={
+                  <GuestRoute>
+                    <Login />
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <GuestRoute>
+                    <Register />
+                  </GuestRoute>
+                }
+              />
             </Route>
 
             {/* 🔐 ONLY protected page */}

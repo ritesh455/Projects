@@ -1,4 +1,4 @@
-const { rewriteWithAI } = require("../services/groqService");
+const { rewriteWithAI } = require("../services/geminiService");
 const { calculateATSScore } = require("../utils/atsScore");
 
 async function improveBulletPoint(req, res) {

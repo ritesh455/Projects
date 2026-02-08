@@ -9,6 +9,7 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 import PublicLayout from "./layouts/PublicLayout";
 import ProtectedRoute from "./Pages/ProtectedRoute";
+import PrivateLayout from "./layouts/PrivateLayout";
 
 function App() {
   return (
@@ -28,13 +29,14 @@ function App() {
 
             {/* 🔐 ONLY protected page */}
             <Route
-              path="/resume-builder"
               element={
                 <ProtectedRoute>
-                  <ResumeBuilder />
+                  <PrivateLayout />
                 </ProtectedRoute>
               }
-            />
+            >
+              <Route path="/resume-builder" element={<ResumeBuilder />} />
+            </Route>
 
           </Routes>
         </ResumeProvider>

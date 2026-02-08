@@ -10,20 +10,28 @@ export interface PersonalInfo {
 
 export interface Education {
   id: string;
+  qualification: string;
   institution: string;
-  degree: string;
-  fieldOfStudy: string;
-  startYear: string;
-  endYear: string;
+  percentage: string;
+  yearOfPassing: string;
+  branch?: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  role: string;
+  technologies: string;
 }
 
 export interface Experience {
   id: string;
-  company: string;
+  company?: string;
   role: string;
   description: string;
-  startDate: string;
-  endDate: string;
+  duration: string;
+  technologies: string;
 }
 
 export interface ResumeData {
@@ -31,4 +39,5 @@ export interface ResumeData {
   education: Education[];
   experience: Experience[];
   skills: string[];
+  // projects: Project[];
 }

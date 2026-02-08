@@ -6,6 +6,8 @@ import type {
   PersonalInfo,
 } from "../types/ResumeTypes";
 
+/* -------------------- INITIAL STATE -------------------- */
+
 const initialResume: ResumeData = {
   personalInfo: {
     fullName: "",
@@ -19,31 +21,54 @@ const initialResume: ResumeData = {
   education: [],
   experience: [],
   skills: [],
+  // projects: [],
 };
+
+/* -------------------- CONTEXT TYPE -------------------- */
 
 type ResumeContextType = {
   resume: ResumeData;
-  updateField: (field: keyof ResumeData, value: any) => void;
+
+  // Personal Info
   updatePersonalInfo: (key: keyof PersonalInfo, value: string) => void;
+
+  // Education
   addEducation: () => void;
+  updateEducation: (
+    index: number,
+    field: keyof Education,
+    value: string
+  ) => void;
   removeEducation: (id: string) => void;
+
+  // Experience
   addExperience: () => void;
+  updateExperience: (
+    index: number,
+    field: keyof Experience,
+    value: any
+  ) => void;
   removeExperience: (id: string) => void;
+
+  // Skills
   addSkill: (skill: string) => void;
   removeSkill: (index: number) => void;
 };
 
+/* -------------------- CONTEXT -------------------- */
+
 const ResumeContext = createContext<ResumeContextType | null>(null);
 
-export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
+/* -------------------- PROVIDER -------------------- */
+
+export const ResumeProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [resume, setResume] = useState<ResumeData>(initialResume);
 
-  const updateField = (field: keyof ResumeData, value: any) => {
-    setResume((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  /* -------- Personal Info -------- */
 
   const updatePersonalInfo = (key: keyof PersonalInfo, value: string) => {
     setResume((prev) => ({
@@ -55,16 +80,34 @@ export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   };
 
+  /* -------- Education -------- */
+
   const addEducation = () => {
     const newEdu: Education = {
       id: Date.now().toString(),
+      qualification: "",
       institution: "",
-      degree: "",
-      fieldOfStudy: "",
-      startYear: "",
-      endYear: "",
+      percentage: "",
+      yearOfPassing: "",
+      branch: "",
     };
-    setResume((prev) => ({ ...prev, education: [...prev.education, newEdu] }));
+
+    setResume((prev) => ({
+      ...prev,
+      education: [...prev.education, newEdu],
+    }));
+  };
+
+  const updateEducation = (
+    index: number,
+    field: keyof Education,
+    value: string
+  ) => {
+    setResume((prev) => {
+      const updated = [...prev.education];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, education: updated };
+    });
   };
 
   const removeEducation = (id: string) => {
@@ -74,16 +117,33 @@ export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   };
 
+  /* -------- Experience -------- */
+
   const addExperience = () => {
     const newExp: Experience = {
       id: Date.now().toString(),
-      company: "",
-      role: "",
+     role: "",
       description: "",
-      startDate: "",
-      endDate: "",
+      duration: "",
+      technologies: "",
     };
-    setResume((prev) => ({ ...prev, experience: [...prev.experience, newExp] }));
+
+    setResume((prev) => ({
+      ...prev,
+      experience: [...prev.experience, newExp],
+    }));
+  };
+
+  const updateExperience = (
+    index: number,
+    field: keyof Experience,
+    value: any
+  ) => {
+    setResume((prev) => {
+      const updated = [...prev.experience];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, experience: updated };
+    });
   };
 
   const removeExperience = (id: string) => {
@@ -93,10 +153,15 @@ export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   };
 
+  /* -------- Skills -------- */
+
   const addSkill = (skill: string) => {
     const s = skill.trim();
     if (!s) return;
-    setResume((prev) => ({ ...prev, skills: [...prev.skills, s] }));
+    setResume((prev) => ({
+      ...prev,
+      skills: [...prev.skills, s],
+    }));
   };
 
   const removeSkill = (index: number) => {
@@ -106,16 +171,22 @@ export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   };
 
+  /* -------- PROVIDER -------- */
+
   return (
     <ResumeContext.Provider
       value={{
         resume,
-        updateField,
-        updatePersonalInfo,
+       updatePersonalInfo,
+
         addEducation,
+        updateEducation,
         removeEducation,
+
         addExperience,
+        updateExperience,
         removeExperience,
+
         addSkill,
         removeSkill,
       }}
@@ -124,6 +195,8 @@ export const ResumeProvider = ({ children }: { children: React.ReactNode }) => {
     </ResumeContext.Provider>
   );
 };
+
+/* -------------------- HOOK -------------------- */
 
 export const useResume = () => {
   const context = useContext(ResumeContext);

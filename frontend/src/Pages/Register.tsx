@@ -1,47 +1,86 @@
 import { useState } from "react";
-import Button from "../components/common/Button";
-import Input from "../components/common/Input";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-export default function Register() {
+const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      await register(name, email, password);
+      navigate("/login");
+    } catch {
+      setError("Registration failed");
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded shadow w-96">
-        <h2 className="text-xl font-bold mb-4 text-center">Register</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-center text-purple-600">
+          Create Account
+        </h2>
 
-        <Input
-          label="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-4">
+            {error}
+          </p>
+        )}
 
-        <Input
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-        <Input
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        <Button
-          text="Create Account"
-          onClick={() => console.log(name, email, password)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <p className="text-sm mt-4 text-center">
+          <button
+            type="submit"
+            className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition"
+          >
+            Register
+          </button>
+        </form>
+
+        <p className="text-sm text-center mt-6">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-600 underline">
+          <Link to="/login" className="text-purple-600 font-medium">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>
   );
-}
+};
+
+export default Register;

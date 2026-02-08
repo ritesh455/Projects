@@ -1,4 +1,11 @@
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 const Home = () => {
+
+    const { user } = useAuth();
+
+
   return (
     <div>
 
@@ -13,14 +20,16 @@ const Home = () => {
             <p className="mt-5 text-gray-600">
               Create modern, job-ready resumes in minutes using our smart resume builder.
             </p>
-            <button className="mt-6 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-              Build My Resume
-            </button>
+            <Link to={user ? "/resume-builder" : "/login"}>
+  <button className="mt-6 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+    Build My Resume
+  </button>
+</Link>
           </div>
 
           {/* Image placeholder */}
           <div className="bg-white h-72 rounded-xl shadow-md flex items-center justify-center">
-            <p className="text-gray-400">Resume Preview Area</p>
+            <img src="/img/ResumeImg.avif" className="rounded-2xl shadow-gray-600" alt="IMG" />
           </div>
 
         </div>
@@ -60,7 +69,7 @@ const Home = () => {
 
           <div className="mt-12 grid md:grid-cols-4 gap-6">
             {[
-              "Easy Drag & Drop",
+              "Subscription Model",
               "Professional Templates",
               "ATS Friendly Resumes",
               "Instant Download",

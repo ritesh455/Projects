@@ -6,7 +6,7 @@ const About = () => {
       <section>
         <h1 className="text-4xl font-bold">About Us</h1>
         <p className="mt-6 text-gray-600 max-w-3xl">
-          ResumeCraft is a modern resume builder platform designed to help
+          CareerForge Pro is a modern resume builder platform designed to help
           students and professionals create job-ready resumes easily.
         </p>
       </section>

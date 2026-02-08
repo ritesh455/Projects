@@ -1,28 +1,63 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { loginUser, registerUser } from "../api/api";
 
-type AuthContextType = {
-  isLoggedIn: boolean;
-  login: () => void;
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
-};
+}
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = () => setIsLoggedIn(true);
-  const logout = () => setIsLoggedIn(false);
+  // ✅ keep user logged in on refresh
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const res = await loginUser({ email, password });
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    setUser(res.data.user);
+     alert("Login successful");
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    await registerUser({ name, email, password });
+    alert("Registration successful. Please login.");
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+     alert("Logged out successfully");
+  };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be inside AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+  return context;
 };

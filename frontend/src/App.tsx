@@ -5,10 +5,10 @@ import { AuthProvider } from "./context/AuthContext";
 import ResumeBuilder from "./Pages/ResumeBuilder";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
-import ProtectedRoute from "./Pages/ProtectedRoute";
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import PublicLayout from "./layouts/PublicLayout";
+import ProtectedRoute from "./Pages/ProtectedRoute";
 
 function App() {
   return (
@@ -17,17 +17,18 @@ function App() {
         <ResumeProvider>
           <Routes>
 
-            {/* 🔓 Public Pages with Navbar + Footer */}
+            {/* 🔓 Public pages – accessible always */}
             <Route element={<PublicLayout />}>
+              <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
             </Route>
 
-            {/* 🔐 Protected Page */}
+            {/* 🔐 ONLY protected page */}
             <Route
-              path="/"
+              path="/resume-builder"
               element={
                 <ProtectedRoute>
                   <ResumeBuilder />

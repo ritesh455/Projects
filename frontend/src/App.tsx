@@ -1,35 +1,34 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ResumeProvider } from "./context/ResumeContext";
-import { AuthProvider } from "./context/AuthContext";
 
-import ResumeBuilder from "./Pages/ResumeBuilder";
-import Login from "./Pages/Login";
-import Register from "./Pages/Register";
+import { AuthProvider } from "./context/AuthContext";
+import { ResumeDataProvider } from "./context/ResumeContext";
+
 import Home from "./Pages/Home";
 import About from "./Pages/About";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import ResumeBuilder from "./Pages/ResumeBuilder";
+
 import PublicLayout from "./layouts/PublicLayout";
-import ProtectedRoute from "./Pages/ProtectedRoute";
 import PrivateLayout from "./layouts/PrivateLayout";
+
+import ProtectedRoute from "./Pages/ProtectedRoute";
 import GuestRoute from "./Pages/GuestRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ResumeProvider>
+        <ResumeDataProvider>
           <Routes>
 
-            {/* 🔓 Public pages – accessible always */}
+            {/* 🔓 PUBLIC ROUTES */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
               <Route path="/about" element={<About />} />
-              {/* <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} /> */}
-            {/* </Route> */}
 
-            
-              {/* 🚫 Login/Register blocked for logged-in users */}
+              {/* 🚫 Login/Register only for logged-out users */}
               <Route
                 path="/login"
                 element={
@@ -48,7 +47,7 @@ function App() {
               />
             </Route>
 
-            {/* 🔐 ONLY protected page */}
+            {/* 🔐 PROTECTED ROUTES */}
             <Route
               element={
                 <ProtectedRoute>
@@ -56,11 +55,14 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route path="/resume-builder" element={<ResumeBuilder />} />
+              <Route
+                path="/resume-builder"
+                element={<ResumeBuilder />}
+              />
             </Route>
 
           </Routes>
-        </ResumeProvider>
+        </ResumeDataProvider>
       </AuthProvider>
     </BrowserRouter>
   );

@@ -1,17 +1,43 @@
-import { useResume } from "../../context/ResumeContext";
+import { useResumeData } from "../../context/ResumeContext";
 
 export default function EducationForm() {
-  const { resume, updateEducation, removeEducation } = useResume();
+  const { resume, setResume, loading } = useResumeData();
+
+  if (loading) {
+    return <p className="text-sm text-gray-500">Loading education...</p>;
+  }
+
+  const education = resume?.education || [];
+
+  const updateEducation = (
+    index: number,
+    field: string,
+    value: string
+  ) => {
+    setResume((prev: any) => {
+      const updated = [...(prev?.education || [])];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, education: updated };
+    });
+  };
+
+  const removeEducation = (id: string) => {
+    setResume((prev: any) => ({
+      ...prev,
+      education: prev.education.filter((edu: any) => edu.id !== id),
+    }));
+  };
 
   return (
     <div className="mt-6">
-      {/* <h2 className="font-semibold mb-3">Education</h2> */}
-      {resume.education.map((edu, index) => (
-  <div key={edu.id ?? index} className="border rounded p-4 mb-4">
-          
+      {education.map((edu: any, index: number) => (
+        <div
+          key={edu.id ?? index}
+          className="border rounded p-4 mb-4"
+        >
           {/* Qualification */}
           <select
-            value={edu.qualification}
+            value={edu.qualification || ""}
             onChange={(e) =>
               updateEducation(index, "qualification", e.target.value)
             }
@@ -29,7 +55,7 @@ export default function EducationForm() {
           <input
             type="text"
             placeholder="University / School"
-            value={edu.institution}
+            value={edu.institution || ""}
             onChange={(e) =>
               updateEducation(index, "institution", e.target.value)
             }
@@ -40,7 +66,7 @@ export default function EducationForm() {
           <input
             type="text"
             placeholder="Percentage / CGPA"
-            value={edu.percentage}
+            value={edu.percentage || ""}
             onChange={(e) =>
               updateEducation(index, "percentage", e.target.value)
             }
@@ -51,7 +77,7 @@ export default function EducationForm() {
           <input
             type="text"
             placeholder="Year of Passing"
-            value={edu.yearOfPassing}
+            value={edu.yearOfPassing || ""}
             onChange={(e) =>
               updateEducation(index, "yearOfPassing", e.target.value)
             }
@@ -63,7 +89,7 @@ export default function EducationForm() {
             <input
               type="text"
               placeholder="Branch"
-              value={edu.branch}
+              value={edu.branch || ""}
               onChange={(e) =>
                 updateEducation(index, "branch", e.target.value)
               }

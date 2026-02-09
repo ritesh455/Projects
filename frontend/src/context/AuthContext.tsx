@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { loginUser, registerUser } from "../api/api";
+import { loginUser, registerUser, logoutUser } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   id: string;
@@ -42,11 +43,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     alert("Registration successful. Please login.");
   };
 
-  const logout = () => {
+  const navigate = useNavigate();
+
+  const logout = async () => {
+    try {
+      // call backend to blacklist token
+      await logoutUser();
+    } catch (err) {
+      // ignore network errors but still clear local state
+      console.warn("Logout API failed", err);
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
-     alert("Logged out successfully");
+    alert("Logged out successfully");
+    navigate("/home");
   };
 
   return (

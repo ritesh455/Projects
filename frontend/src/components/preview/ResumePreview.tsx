@@ -116,6 +116,37 @@ export default function ResumePreview() {
           ))}
         </div>
       )}
+
+      {/* Projects (IMAGE STYLE) */}
+      {resume.projects.length > 0 && (
+        <div className="mt-6">
+          <h2 className="font-bold text-lg border-b-2 border-black inline-block">
+            Projects
+          </h2>
+
+          {resume.projects.map((pj) => (
+            <div key={pj.id} className="mt-3">
+             
+              <ul className="list-disc list-inside">
+                <li>
+                  <strong>Project Name:</strong> {pj.name}
+                </li>
+                <li>
+                  <strong>Role:</strong> {pj.role}
+                </li>
+                <li>
+                  <strong>Technologies Used:</strong> {pj.technologies}
+                </li>
+                <li>
+                  <strong>Description:</strong> {pj.description}
+                </li>
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+
     </div>
   );
 }

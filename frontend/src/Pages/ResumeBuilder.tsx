@@ -6,12 +6,12 @@ import ExperienceForm from "../components/form/ExperienceForm";
 import ResumePreview from "../components/preview/ResumePreview";
 import { useResume } from "../context/ResumeContext";
 
-// import AddProjects from "../components/form/AddProjects";
+import AddProjects from "../components/form/Projects";
 
 
 export default function ResumeBuilder() {
 
-  const { addEducation, addExperience, resume } = useResume();
+  const { addEducation, addExperience, addProjects, resume } = useResume();
   const [selectedExp, setSelectedExp] = useState<number>(
     resume.experience.length > 0 ? resume.experience.length - 1 : -1
   );
@@ -72,6 +72,25 @@ export default function ResumeBuilder() {
           {/* 🔥 NEW */}
           <ExperienceForm />
         </div>
+
+
+         {/* Project */}
+        <div className="mt-6">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="font-semibold">Projects</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={addProjects}
+                className="px-4 py-2 border rounded bg-gray-50"
+              >
+                + Add Project
+              </button>
+            </div>
+          </div>
+
+          {/* 🔥 NEW */}
+          <AddProjects />
+          </div>
       
 
 </div>

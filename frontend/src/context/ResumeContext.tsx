@@ -4,6 +4,7 @@ import type {
   Education,
   Experience,
   PersonalInfo,
+  Project,
 } from "../types/ResumeTypes";
 
 /* -------------------- INITIAL STATE -------------------- */
@@ -21,7 +22,7 @@ const initialResume: ResumeData = {
   education: [],
   experience: [],
   skills: [],
-  // projects: [],
+  projects: [],
 };
 
 /* -------------------- CONTEXT TYPE -------------------- */
@@ -49,6 +50,16 @@ type ResumeContextType = {
     value: any
   ) => void;
   removeExperience: (id: string) => void;
+
+  
+  // Projects
+    addProjects: () => void;
+  updateProject: (
+    index: number,
+    field: keyof Project,
+    value: any
+  ) => void;
+  removeProject: (id: string) => void;
 
   // Skills
   addSkill: (skill: string) => void;
@@ -153,6 +164,45 @@ export const ResumeProvider = ({
     }));
   };
 
+
+  /* -------- Add Project -------- */
+
+  const addProjects = () => {
+    const newProj: Project = {
+      id: Date.now().toString(),
+      name: "",
+      description: "",
+      role: "",   
+      technologies: "",
+    };
+
+    setResume((prev) => ({
+      ...prev,
+      projects: [...prev.projects, newProj],
+    }));
+  };
+
+  const updateProject = (
+    index: number,
+    field: keyof Project,
+    value: any
+  ) => {
+    setResume((prev) => {
+      const updated = [...prev.projects];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, projects: updated };
+    });
+  };
+
+  const removeProject = (id: string) => {
+    setResume((prev) => ({
+      ...prev,
+      projects: prev.projects.filter((pj) => pj.id !== id),
+    }));
+  };
+
+
+
   /* -------- Skills -------- */
 
   const addSkill = (skill: string) => {
@@ -186,6 +236,10 @@ export const ResumeProvider = ({
         addExperience,
         updateExperience,
         removeExperience,
+
+        addProjects,
+        updateProject,
+        removeProject,
 
         addSkill,
         removeSkill,

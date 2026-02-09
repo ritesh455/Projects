@@ -5,7 +5,7 @@ export default function EducationForm() {
 
   return (
     <div className="mt-6">
-      <h2 className="font-semibold mb-3">Education</h2>
+      {/* <h2 className="font-semibold mb-3">Education</h2> */}
       {resume.education.map((edu, index) => (
   <div key={edu.id ?? index} className="border rounded p-4 mb-4">
           

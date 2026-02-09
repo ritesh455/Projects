@@ -39,5 +39,5 @@ export interface ResumeData {
   education: Education[];
   experience: Experience[];
   skills: string[];
-  // projects: Project[];
+  projects: Project[];
 }

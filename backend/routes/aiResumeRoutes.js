@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { improveAndSaveResume } = require("../controllers/aiResumeController");
+const { improveAndSaveResume,getMyResume, } = require("../controllers/aiResumeController");
 const validateResumeData = require("../middleware/validateResumeData");
 const protect = require("../middleware/authMiddleware");
 
@@ -11,5 +11,8 @@ router.post(
   validateResumeData,
   improveAndSaveResume
 );
+
+/* Fetch current user's resume */
+router.get("/me", protect, getMyResume);
 
 module.exports = router;

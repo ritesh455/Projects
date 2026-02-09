@@ -8,6 +8,35 @@ const sleep = (ms) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 
+
+/* -------------------------------------------
+   GET logged-in user's resume
+-------------------------------------------- */
+async function getMyResume(req, res) {
+  try {
+    const userId = req.user._id;
+
+    const resume = await AIResumeVersion.findOne({ userId });
+
+    if (!resume) {
+      return res.status(404).json({
+        message: "No resume found for this user",
+        data: null,
+      });
+    }
+
+    res.status(200).json({
+      message: "Resume fetched successfully",
+      data: resume,
+    });
+  } catch (error) {
+    console.error("Fetch Resume Error:", error.message);
+    res.status(500).json({
+      message: "Failed to fetch resume",
+    });
+  }
+}
+
 async function improveAndSaveResume(req, res) {
   try {
     const userId = req.user._id;
@@ -23,7 +52,7 @@ async function improveAndSaveResume(req, res) {
     );
 
      const improvedSummary = await rewriteWithAI(summaryPrompt);
-     await sleep(1200);
+     await sleep(1500);
 
       /* 2️⃣ Experience Descriptions */
     const improvedExperience = [];
@@ -41,7 +70,7 @@ async function improveAndSaveResume(req, res) {
 
 
       const improvedDesc = await rewriteWithAI(expPrompt);
-      await sleep(1200);
+      await sleep(1500);
 
       improvedExperience.push({
         ...exp,
@@ -68,7 +97,7 @@ async function improveAndSaveResume(req, res) {
 
 
       const improvedDesc = await rewriteWithAI(projPrompt);
-      await sleep(1200);
+      await sleep(1500);
 
          improvedProjects.push({
         ...proj,
@@ -120,4 +149,4 @@ async function improveAndSaveResume(req, res) {
   }
 }
 
-module.exports = { improveAndSaveResume };
+module.exports = { improveAndSaveResume, getMyResume };

@@ -27,7 +27,7 @@ export interface Project {
 
 export interface Experience {
   id: string;
-  company?: string;
+  company: string;
   role: string;
   description: string;
   duration: string;

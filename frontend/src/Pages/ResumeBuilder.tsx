@@ -8,23 +8,86 @@ import { useResume } from "../context/ResumeContext";
 
 import AddProjects from "../components/form/Projects";
 
+import improveText from "../utils/improveResumeWithAI";
+
 
 export default function ResumeBuilder() {
 
-  const { addEducation, addExperience, addProjects, resume } = useResume();
-  const [selectedExp, setSelectedExp] = useState<number>(
-    resume.experience.length > 0 ? resume.experience.length - 1 : -1
-  );
+  // const { addEducation, addExperience, addProjects, resume } = useResume();
+ 
+const {
+  addEducation,
+  addExperience,
+  addProjects,
+  resume,
+  updatePersonalInfo,
+  updateExperience,
+  updateProject,
+} = useResume();
 
-  useEffect(() => {
-    // keep selection in range when experiences change
-    if (resume.experience.length === 0) setSelectedExp(-1);
-    else if (selectedExp >= resume.experience.length)
-      setSelectedExp(resume.experience.length - 1);
-  }, [resume.experience.length, selectedExp]);
+
+
+const [improving, setImproving] = useState(false);
+
+const handleImproveResume = async () => {
+  setImproving(true);
+
+  try {
+    /* 1️⃣ Professional Summary */
+    if (resume.personalInfo.summary?.trim()) {
+      const improvedSummary = await improveText(
+        resume.personalInfo.summary,
+        "summary"
+      );
+
+      if (improvedSummary) {
+        updatePersonalInfo("summary", improvedSummary);
+      }
+    }
+
+    /* 2️⃣ Experience Descriptions (INDEPENDENT) */
+    for (let i = 0; i < resume.experience.length; i++) {
+      const exp = resume.experience[i];
+
+      if (exp.description?.trim()) {
+        const improvedExp = await improveText(
+          exp.description,
+          "experience"
+        );
+
+        if (improvedExp) {
+          updateExperience(i, "description", improvedExp);
+        }
+      }
+    }
+
+    /* 3️⃣ Project Descriptions (INDEPENDENT) */
+    for (let i = 0; i < resume.projects.length; i++) {
+      const project = resume.projects[i];
+
+      if (project.description?.trim()) {
+        const improvedProject = await improveText(
+          project.description,
+          "project"
+        );
+
+        if (improvedProject) {
+          updateProject(i, "description", improvedProject);
+        }
+      }
+    }
+  } catch (error) {
+    alert("AI improvement failed. Please try again.");
+  } finally {
+    setImproving(false);
+  }
+};
+
+
 
   return (
     <div className="grid grid-cols-2 gap-6 p-6 items-start">
+
       {/* LEFT SIDE – FORMS */}
       <div
         style={{
@@ -33,6 +96,17 @@ export default function ResumeBuilder() {
           paddingRight: "1rem",
         }}
       >
+
+        <button
+  onClick={handleImproveResume}
+  disabled={improving}
+  className="mb-4 px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
+>
+  {improving ? "✨ Improving Resume..." : "✨ Improve Resume with AI"}
+</button>
+
+
+
         {/* Personal Info */}
         <PersonalInfoForm />
 

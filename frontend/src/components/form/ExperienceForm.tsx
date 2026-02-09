@@ -11,6 +11,15 @@ export default function ExperienceForm() {
         <div key={exp.id ?? index} className="border rounded p-4 mb-6">
           
           <input
+            placeholder="Company Name"
+            value={exp.company}
+            onChange={(e) =>
+              updateExperience(index, "company", e.target.value)
+            }
+            className="w-full border p-2 mb-2"
+          />
+
+          <input
             placeholder="Duration"
             value={exp.duration}
             onChange={(e) =>

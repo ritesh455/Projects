@@ -100,6 +100,9 @@ export default function ResumePreview() {
              
               <ul className="list-disc list-inside">
                 <li>
+                  <strong>Company Name:</strong> {ex.company}
+                </li>
+                <li>
                   <strong>Duration:</strong> {ex.duration}
                 </li>
                 <li>

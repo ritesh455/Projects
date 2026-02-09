@@ -133,6 +133,7 @@ export const ResumeProvider = ({
   const addExperience = () => {
     const newExp: Experience = {
       id: Date.now().toString(),
+     company: "",
      role: "",
       description: "",
       duration: "",

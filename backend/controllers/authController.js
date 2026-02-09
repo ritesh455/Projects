@@ -51,11 +51,12 @@ exports.login = async (req, res) => {
     }
 
     // generate token
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    const token = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
 
     res.json({
       message: "Login successful",

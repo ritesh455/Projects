@@ -14,7 +14,11 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+
 app.use("/api/ai", require("./routes/aiRoutes")); // 👈 AI Magic Button
+
+app.use("/api/ai-resume", require("./routes/aiResumeRoutes"));
+
 
 // Health check
 app.get("/", (req, res) => {

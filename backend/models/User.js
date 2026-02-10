@@ -17,6 +17,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    isPro: {
+  type: Boolean,
+  default: false,
+},
+
+proExpiresAt: {
+  type: Date,
+  default: null,
+},
+
   },
   { timestamps: true }
 );

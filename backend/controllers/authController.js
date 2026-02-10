@@ -38,6 +38,8 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+        isPro: false,
+        proExpiresAt: null,
     });
 
     // ✅ generate token
@@ -92,6 +94,8 @@ exports.login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+         isPro: user.isPro,
+    proExpiresAt: user.proExpiresAt,
       },
     });
   } catch (error) {
@@ -122,5 +126,38 @@ exports.logout = async (req, res) => {
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+
+exports.getMe = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+
+    const user = await User.findById(userId).select(
+      "name email isPro proExpiresAt"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // optional: auto-expire Pro
+    if (user.isPro && user.proExpiresAt && user.proExpiresAt < new Date()) {
+      user.isPro = false;
+      user.proExpiresAt = null;
+      await user.save();
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("GetMe error:", error.message);
+    res.status(500).json({
+      message: "Failed to fetch user info",
+    });
   }
 };

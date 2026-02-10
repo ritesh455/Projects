@@ -8,7 +8,7 @@ import Projects from "../components/form/Projects";
 import ResumePreview from "../components/preview/ResumePreview";
 
 import { useResumeData } from "../context/ResumeContext";
-import improveText from "../utils/improveResumeWithAI";
+import { improveAndSaveResume } from "../api/api";
 
 export default function ResumeBuilder() {
   const { resume, setResume, loading } = useResumeData();
@@ -82,68 +82,21 @@ export default function ResumeBuilder() {
     setImproving(true);
 
     try {
-      /* 1️⃣ Professional Summary */
-      if (resume.personalInfo?.summary?.trim()) {
-        const improvedSummary = await improveText(
-          resume.personalInfo.summary,
-          "summary"
-        );
+      // Use backend bulk improve & save endpoint which handles summary,
+      // experiences and projects in one request and persists the improved
+      // version. This endpoint is protected, so ensure the user is logged in.
 
-        if (improvedSummary) {
-          setResume((prev: any) => ({
-            ...prev,
-            personalInfo: {
-              ...prev.personalInfo,
-              improvedSummary,
-            },
-          }));
-        }
-      }
+      const result = await improveAndSaveResume(resume);
 
-      /* 2️⃣ Experience Descriptions */
-      for (let i = 0; i < resume.experience.length; i++) {
-        const exp = resume.experience[i];
-        if (!exp.description?.trim()) continue;
-
-        const improvedExp = await improveText(
-          exp.description,
-          "experience"
-        );
-
-        if (improvedExp) {
-          setResume((prev: any) => {
-            const updated = [...prev.experience];
-            updated[i] = {
-              ...updated[i],
-              improvedDescription: improvedExp,
-            };
-            return { ...prev, experience: updated };
-          });
-        }
-      }
-
-      /* 3️⃣ Project Descriptions */
-      for (let i = 0; i < resume.projects.length; i++) {
-        const pj = resume.projects[i];
-        if (!pj.description?.trim()) continue;
-
-        const improvedProject = await improveText(
-          pj.description,
-          "project"
-        );
-
-        if (improvedProject) {
-          setResume((prev: any) => {
-            const updated = [...prev.projects];
-            updated[i] = {
-              ...updated[i],
-              improvedDescription: improvedProject,
-            };
-            return { ...prev, projects: updated };
-          });
-        }
+      // API returns { message, data: record }
+      if (result && result.data) {
+        setResume(result.data);
+      } else {
+        // fallback: alert user
+        alert("AI improvement completed but no data returned from server.");
       }
     } catch (err) {
+      console.error("Improve resume failed:", err);
       alert("AI improvement failed. Please try again.");
     } finally {
       setImproving(false);

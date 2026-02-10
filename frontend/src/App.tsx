@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ResumeDataProvider } from "./context/ResumeContext";
 
+import PaymentSuccess from "./Pages/PaymentSuccess";
+
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Login from "./Pages/Login";
@@ -46,6 +48,8 @@ function App() {
                 }
               />
             </Route>
+
+             <Route path="/payment-success" element={<PaymentSuccess />} />
 
             {/* 🔐 PROTECTED ROUTES */}
             <Route

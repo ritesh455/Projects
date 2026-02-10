@@ -57,4 +57,30 @@ export const improveAndSaveResume = async (resumeData: any) => {
   }
 };
 
+
+/* DOWNLOAD RESUME PDF (PRO ONLY) */
+export const downloadResumePdf = async (html: string) => {
+  const res = await API.post(
+    "/pdf/download",
+    { html },
+    {
+      responseType: "blob", // 👈 IMPORTANT for file download
+    }
+  );
+  return res.data;
+};
+
+/* CREATE STRIPE CHECKOUT SESSION */
+export const createCheckoutSession = async () => {
+  const res = await API.post("/payments/create-checkout");
+  return res.data;
+};
+
+export const saveResumeOnly = async (resumeData: any) => {
+  const res = await API.post("/ai-resume/save", resumeData);
+  return res.data;
+};
+
+
+
 export default API;

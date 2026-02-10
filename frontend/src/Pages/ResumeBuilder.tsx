@@ -1,5 +1,14 @@
 import { useState } from "react";
 
+import { useRef } from "react";
+import { downloadResumePdf } from "../api/api";
+import { triggerPdfDownload } from "../utils/downloadPdf";
+import { useAuth } from "../context/AuthContext";
+
+import { createCheckoutSession } from "../api/api";
+
+
+
 import PersonalInfoForm from "../components/form/PersonalInfoForm";
 import SkillsForm from "../components/form/SkillsForm";
 import EducationForm from "../components/form/EducationForm";
@@ -8,11 +17,50 @@ import Projects from "../components/form/Projects";
 import ResumePreview from "../components/preview/ResumePreview";
 
 import { useResumeData } from "../context/ResumeContext";
-import { improveAndSaveResume } from "../api/api";
+import { improveAndSaveResume, saveResumeOnly } from "../api/api";
 
 export default function ResumeBuilder() {
   const { resume, setResume, loading } = useResumeData();
   const [improving, setImproving] = useState(false);
+
+  const previewRef = useRef<HTMLDivElement>(null);
+const { user } = useAuth();
+
+//download PDF handler with pro check
+const handleDownloadPdf = async () => {
+  try {
+    if (!user?.isPro) {
+      // ✅ Save ONLY (no AI)
+      await saveResumeOnly(resume);
+
+      localStorage.setItem("downloadAfterPayment", "true");
+
+      const data = await createCheckoutSession();
+      window.location.href = data.url;
+      return;
+    }
+
+    // ✅ Pro user → download
+    const html = previewRef.current?.innerHTML;
+    if (!html) {
+      alert("Resume preview not found");
+      return;
+    }
+
+    const pdfBlob = await downloadResumePdf(html);
+    triggerPdfDownload(pdfBlob);
+
+  } catch (error: any) {
+    alert(
+      error?.response?.data?.message ||
+      "Failed to process PDF download"
+    );
+  }
+};
+
+
+
+
 
   if (loading) {
     return <p className="text-sm text-gray-500">Loading resume builder...</p>;
@@ -124,6 +172,14 @@ export default function ResumeBuilder() {
           {improving ? "✨ Improving Resume..." : "✨ Improve Resume with AI"}
         </button>
 
+        <button
+  onClick={handleDownloadPdf}
+  className="mb-4 ml-2 px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+>
+  📄 Download PDF
+</button>
+
+
         <PersonalInfoForm />
 
         {/* Education */}
@@ -174,7 +230,11 @@ export default function ResumeBuilder() {
       {/* RIGHT SIDE – PREVIEW */}
       <div className="self-start">
         <div className="sticky top-6">
-          <ResumePreview />
+          <div ref={previewRef}>
+  <ResumePreview />
+</div>
+
+          {/* <ResumePreview /> */}
         </div>
       </div>
     </div>

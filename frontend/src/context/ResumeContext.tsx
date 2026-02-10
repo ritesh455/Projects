@@ -263,8 +263,6 @@
 
 
 
-
-
 import React, {
   createContext,
   useContext,
@@ -293,7 +291,7 @@ const emptyResume = {
   skills: [],
 };
 
-/* 🔹 SAFE NORMALIZATION (DO NOT FLATTEN SUMMARY) */
+/* 🔹 SAFE NORMALIZATION (DO NOT FLATTEN SUMMARY OBJECT) */
 const normalizeResume = (resume: any) => ({
   ...emptyResume,
   ...resume,
@@ -309,14 +307,14 @@ export const ResumeDataProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user } = useAuth(); // 🔥 KEY FIX
+  const { user } = useAuth(); // 🔥 reacts to login / logout / payment refresh
 
   const [resume, setResume] = useState<any>(emptyResume);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadResume() {
-      // 🔥 USER LOGGED OUT
+      // 🔥 USER LOGGED OUT → RESET STATE
       if (!user) {
         setResume(emptyResume);
         setLoading(false);
@@ -326,12 +324,28 @@ export const ResumeDataProvider = ({
       setLoading(true);
 
       try {
-        const res = await fetchUserResume();
-        const resumeData = res?.data ?? res;
+        const result = await fetchUserResume();
 
-        setResume(normalizeResume(resumeData));
+        /**
+         * fetchUserResume() may return:
+         * 1️⃣ resume object
+         * 2️⃣ null (404 → new user)
+         * 3️⃣ { message, data }
+         */
+
+        const resumeData =
+          result && typeof result === "object" && "data" in result
+            ? result.data
+            : result;
+
+        if (!resumeData) {
+          // 🔥 NEW USER → EMPTY RESUME
+          setResume(emptyResume);
+        } else {
+          setResume(normalizeResume(resumeData));
+        }
       } catch (error) {
-        // 🔥 NEW USER (NO RESUME IN DB)
+        // 🔥 SAFETY FALLBACK
         setResume(emptyResume);
       } finally {
         setLoading(false);
@@ -339,7 +353,7 @@ export const ResumeDataProvider = ({
     }
 
     loadResume();
-  }, [user?.id]); // 🔥 THIS LINE FIXES EVERYTHING
+  }, [user?.id]); // 🔥 CRITICAL: refetch on user change
 
   return (
     <ResumeDataContext.Provider
@@ -354,4 +368,12 @@ export const ResumeDataProvider = ({
   );
 };
 
-export const useResumeData = () => useContext(ResumeDataContext);
+export const useResumeData = () => {
+  const context = useContext(ResumeDataContext);
+  if (!context) {
+    throw new Error(
+      "useResumeData must be used inside ResumeDataProvider"
+    );
+  }
+  return context;
+};

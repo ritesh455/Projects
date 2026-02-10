@@ -6,19 +6,42 @@ interface User {
   id: string;
   name: string;
   email: string;
+  isPro: boolean;              // 🔥 NEW
+  proExpiresAt: string | null; // 🔥 NEW
 }
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // 🔥 NEW
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
+
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+
+  //  NEW: Refresh user data (e.g. after payment)
+  const refreshUser = async () => {
+  try {
+    const res = await fetch("/api/auth/me", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    const data = await res.json();
+    setUser(data);
+    localStorage.setItem("user", JSON.stringify(data));
+  } catch (err) {
+    console.error("Failed to refresh user");
+  }
+};
+
 
   // ✅ keep user logged in on refresh
   useEffect(() => {
@@ -62,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user,setUser,refreshUser, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,23 @@
 module.exports = function validateResumeData(req, res, next) {
   const { personalInfo, experience, projects, skills } = req.body;
 
-  if (!personalInfo?.summary?.trim()) {
+  // Helper to safely extract a text string from a field that may be
+  // either a plain string or an object like { old_summary, improved_summary }
+  const extractText = (val) => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      return (
+        val.improved_summary || val.improved_description || val.improvedDescription ||
+        val.old_summary || val.old_description || val.oldDescription ||
+        ""
+      );
+    }
+    return "";
+  };
+
+  const summaryText = extractText(personalInfo?.summary);
+  if (!summaryText.trim()) {
     return res.status(400).json({
       message: "Professional summary is required",
     });
@@ -14,7 +30,8 @@ module.exports = function validateResumeData(req, res, next) {
   }
 
   for (const exp of experience) {
-    if (!exp.description?.trim()) {
+    const desc = extractText(exp.description);
+    if (!desc.trim()) {
       return res.status(400).json({
         message: "Experience description is required",
       });
@@ -28,7 +45,8 @@ module.exports = function validateResumeData(req, res, next) {
   }
 
   for (const proj of projects) {
-    if (!proj.description?.trim()) {
+    const desc = extractText(proj.description);
+    if (!desc.trim()) {
       return res.status(400).json({
         message: "Project description is required",
       });

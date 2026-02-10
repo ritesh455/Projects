@@ -8,6 +8,23 @@ const sleep = (ms) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 
+const extractText = (val) => {
+  if (typeof val === "string") return val;
+
+  if (typeof val === "object" && val !== null) {
+    return (
+      val.improved_summary ||
+      val.improved_description ||
+      val.old_summary ||
+      val.old_description ||
+      ""
+    );
+  }
+
+  return "";
+};
+
+
 
 /* -------------------------------------------
    GET logged-in user's resume
@@ -70,14 +87,21 @@ async function improveAndSaveResume(req, res) {
 
 
       const improvedDesc = await rewriteWithAI(expPrompt);
+
+      const rawExpDescription =
+  typeof exp.description === "object"
+    ? exp.description.improved_description ||
+      exp.description.old_description
+    : exp.description;
+
       await sleep(1500);
 
       improvedExperience.push({
         ...exp,
         description: {
-          old_description: exp.description,
-          improved_description: improvedDesc,
-        },
+  old_description: rawExpDescription,
+  improved_description: improvedDesc,
+},
       });
     }
 
@@ -99,17 +123,26 @@ async function improveAndSaveResume(req, res) {
       const improvedDesc = await rewriteWithAI(projPrompt);
       await sleep(1500);
 
+      const rawProjDescription = extractText(proj.description);
+
          improvedProjects.push({
         ...proj,
         description: {
-          old_description: proj.description,
-          improved_description: improvedDesc,
-        },
+  old_description: rawProjDescription,
+  improved_description: improvedDesc,
+},
       });
     }
 
     const latency = Date.now() - startTime;
     const atsScore = calculateATSScore(improvedSummary, resume.skills);
+
+    const rawSummary =
+  typeof resume.personalInfo.summary === "object"
+    ? resume.personalInfo.summary.improved_summary ||
+      resume.personalInfo.summary.old_summary
+    : resume.personalInfo.summary;
+
 
     // 4️⃣ Save Version
     const record = await AIResumeVersion.findOneAndUpdate(
@@ -119,9 +152,9 @@ async function improveAndSaveResume(req, res) {
     personalInfo: {
       ...resume.personalInfo,
       summary: {
-        old_summary: resume.personalInfo.summary,
-        improved_summary: improvedSummary,
-      },
+  old_summary: rawSummary,
+  improved_summary: improvedSummary,
+},
     },
     education: resume.education,
     experience: improvedExperience,

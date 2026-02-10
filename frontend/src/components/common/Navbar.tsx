@@ -18,6 +18,7 @@ const Navbar = () => {
         <ul className="hidden md:flex space-x-8 font-medium text-gray-700">
           <li><Link to="/" className="hover:text-purple-600">Home</Link></li>
           <li><Link to="/about" className="hover:text-purple-600">About</Link></li>
+          <li><Link to="/saved-resumes" className="hover:text-purple-600">saved-resumes</Link></li>
         </ul>
 
         {/* Desktop Auth Buttons */}
@@ -83,6 +84,7 @@ const Navbar = () => {
           <ul className="space-y-4 font-medium text-gray-700">
             <li><Link to="/" onClick={() => setIsOpen(false)} className="block">Home</Link></li>
             <li><Link to="/about" onClick={() => setIsOpen(false)} className="block">About</Link></li>
+            <li><Link to="/saved-resumes" onClick={() => setIsOpen(false)} className="block">saved-resumes</Link></li>
           </ul>
           
           <div className="flex flex-col space-y-3 pt-4 border-t">

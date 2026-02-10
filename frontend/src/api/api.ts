@@ -81,6 +81,45 @@ export const saveResumeOnly = async (resumeData: any) => {
   return res.data;
 };
 
+// Ritesh Paste
+
+export const generateCoverLetterApi = async (data: any) => {
+  const res = await API.post(
+    "/ai/cover-letter",
+    data,
+    {
+      responseType: "blob", // 🔥 PDF download
+    }
+  );
+
+  return res.data;
+};
+
+
+// Ritesh end
+// om paste
+export const saveResumeVersion = async (data: {
+  name: string;
+  description?: string;
+  template?: string;
+}) => {
+  const res = await API.post("/saved-resumes/save", data);
+  return res.data;
+};
+
+/* GET SAVED RESUMES LIST */
+export const getSavedResumes = async () => {
+  const res = await API.get("/saved-resumes");
+  return res.data; // { data: [...] }
+};
+
+
+/* LOAD SAVED RESUME */
+export const loadSavedResume = async (id: string) => {
+  const res = await API.post(`/saved-resumes/${id}/load`);
+  return res.data; // { success: true }
+};
+// om end
 
 
 export default API;

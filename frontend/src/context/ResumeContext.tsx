@@ -269,7 +269,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { fetchUserResume } from "../api/api";
+import { fetchUserResume,generateCoverLetterApi } from "../api/api";
 import { useAuth } from "./AuthContext";
 
 const ResumeDataContext = createContext<any>(null);
@@ -311,56 +311,124 @@ export const ResumeDataProvider = ({
 
   const [resume, setResume] = useState<any>(emptyResume);
   const [loading, setLoading] = useState(true);
+  const [coverLetterLoading, setCoverLetterLoading] = useState(false);
+  // useEffect(() => {
+  //   async function loadResume() {
+  //     // 🔥 USER LOGGED OUT → RESET STATE
+  //     if (!user) {
+  //       setResume(emptyResume);
+  //       setLoading(false);
+  //       return;
+  //     }
 
-  useEffect(() => {
-    async function loadResume() {
-      // 🔥 USER LOGGED OUT → RESET STATE
-      if (!user) {
-        setResume(emptyResume);
-        setLoading(false);
-        return;
-      }
+  //     setLoading(true);
 
-      setLoading(true);
+  //     try {
+  //       const result = await fetchUserResume();
 
-      try {
-        const result = await fetchUserResume();
+  //       /**
+  //        * fetchUserResume() may return:
+  //        * 1️⃣ resume object
+  //        * 2️⃣ null (404 → new user)
+  //        * 3️⃣ { message, data }
+  //        */
 
-        /**
-         * fetchUserResume() may return:
-         * 1️⃣ resume object
-         * 2️⃣ null (404 → new user)
-         * 3️⃣ { message, data }
-         */
+  //       const resumeData =
+  //         result && typeof result === "object" && "data" in result
+  //           ? result.data
+  //           : result;
 
-        const resumeData =
-          result && typeof result === "object" && "data" in result
-            ? result.data
-            : result;
+  //       if (!resumeData) {
+  //         // 🔥 NEW USER → EMPTY RESUME
+  //         setResume(emptyResume);
+  //       } else {
+  //         setResume(normalizeResume(resumeData));
+  //       }
+  //     } catch (error) {
+  //       // 🔥 SAFETY FALLBACK
+  //       setResume(emptyResume);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
 
-        if (!resumeData) {
-          // 🔥 NEW USER → EMPTY RESUME
-          setResume(emptyResume);
-        } else {
-          setResume(normalizeResume(resumeData));
-        }
-      } catch (error) {
-        // 🔥 SAFETY FALLBACK
-        setResume(emptyResume);
-      } finally {
-        setLoading(false);
-      }
+  //   loadResume();
+  // }, [user?.id]); // 🔥 CRITICAL: refetch on user change
+const loadResume = async () => {
+  // 🔥 USER LOGGED OUT → RESET STATE
+  if (!user) {
+    setResume(emptyResume);
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const result = await fetchUserResume();
+
+    const resumeData =
+      result && typeof result === "object" && "data" in result
+        ? result.data
+        : result;
+
+    if (!resumeData) {
+      setResume(emptyResume);
+    } else {
+      setResume(normalizeResume(resumeData));
     }
+  } catch (error) {
+    setResume(emptyResume);
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  loadResume();
+}, [user?.id]);
+// om paste
+const generateCoverLetter = async (payload: any) => {
+  try {
+    setCoverLetterLoading(true);
 
-    loadResume();
-  }, [user?.id]); // 🔥 CRITICAL: refetch on user change
+    const pdfBlob = await generateCoverLetterApi(payload);
 
+    const proceed = window.confirm(
+      "Your cover letter PDF is ready and will start downloading. Click OK to continue."
+    );
+
+    if (!proceed) return;
+
+    const url = window.URL.createObjectURL(
+      new Blob([pdfBlob], { type: "application/pdf" })
+    );
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "cover_letter.pdf";
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error: any) {
+    if (error.response?.status === 403) {
+      throw new Error("NOT_PRO");
+    }
+    if (error.response?.status === 401) {
+      throw new Error("UNAUTHORIZED");
+    }
+    throw new Error("FAILED");
+  } finally {
+    setCoverLetterLoading(false);
+  }
+};
+//om end
   return (
     <ResumeDataContext.Provider
       value={{
         resume,
         setResume,
         loading,
+        refreshResume: loadResume,generateCoverLetter,coverLetterLoading,
       }}
     >
       {children}

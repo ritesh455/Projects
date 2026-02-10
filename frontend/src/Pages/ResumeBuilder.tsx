@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useRef } from "react";
 import { downloadResumePdf } from "../api/api";
@@ -7,7 +8,10 @@ import { useAuth } from "../context/AuthContext";
 
 import { createCheckoutSession } from "../api/api";
 
-
+import { useTemplate } from "../context/TemplateContext";
+import TemplateOne from "../components/templates/TemplateOne";
+import TemplateTwo from "../components/templates/TemplateTwo";
+import TemplateThree from "../components/templates/TemplateThree";
 
 import PersonalInfoForm from "../components/form/PersonalInfoForm";
 import SkillsForm from "../components/form/SkillsForm";
@@ -18,10 +22,20 @@ import ResumePreview from "../components/preview/ResumePreview";
 
 import { useResumeData } from "../context/ResumeContext";
 import { improveAndSaveResume, saveResumeOnly } from "../api/api";
+import { saveResumeVersion } from "../api/api";
 
 export default function ResumeBuilder() {
   const { resume, setResume, loading } = useResumeData();
   const [improving, setImproving] = useState(false);
+
+  const navigate = useNavigate();
+  //om paste
+const [showSaveModal, setShowSaveModal] = useState(false);
+const [saveName, setSaveName] = useState("");
+const [saveDescription, setSaveDescription] = useState("");
+
+  //om end
+  const { template } = useTemplate();
 
   const previewRef = useRef<HTMLDivElement>(null);
 const { user } = useAuth();
@@ -71,6 +85,40 @@ const handleDownloadPdf = async () => {
   }
 
   /* ---------------- ADD HELPERS ---------------- */
+
+  //om paste
+  const handleSaveResume = async () => {
+  if (!saveName.trim()) {
+    alert("Please enter a resume name");
+    return;
+  }
+
+  try {
+    // 🔥 ONLY snapshot save (NO AI, NO overwrite)
+    await saveResumeOnly(resume);
+    await saveResumeVersion({
+      name: saveName,
+      description: saveDescription,
+      template,
+    });
+
+    alert("Resume saved successfully");
+
+    // reset
+    setShowSaveModal(false);
+    setSaveName("");
+    setSaveDescription("");
+  } catch (err: any) {
+    alert(
+      err?.response?.data?.message ||
+      "Failed to save resume"
+    );
+  }
+};
+//om end
+
+
+
 
   const addEducation = () => {
     setResume((prev: any) => ({
@@ -178,6 +226,80 @@ const handleDownloadPdf = async () => {
 >
   📄 Download PDF
 </button>
+{/* Pasted by Ritesh */}
+
+ <button
+        onClick={() => navigate("/cover-letter")}
+        style={{
+          marginTop: "16px",
+          padding: "10px 16px",
+          background: "#111",
+          color: "#fff",
+          borderRadius: "6px",
+        }}
+      >
+        Generate Cover Letter
+      </button>
+
+{/* Pasted end by Ritesh */}
+{/* om paste */}
+     <button
+  onClick={() => setShowSaveModal(true)}
+  className="mb-4 ml-2 px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+>
+  💾 Save Resume
+</button>
+
+
+{showSaveModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded w-96">
+      <h2 className="text-lg font-bold mb-3">
+        Save Resume
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Resume Name"
+        value={saveName}
+        onChange={(e) => setSaveName(e.target.value)}
+        className="w-full border p-2 mb-3"
+      />
+
+      <textarea
+        placeholder="Description (optional)"
+        value={saveDescription}
+        onChange={(e) => setSaveDescription(e.target.value)}
+        className="w-full border p-2 mb-3"
+      />
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setShowSaveModal(false)}
+          className="px-4 py-2 border rounded"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSaveResume}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+{/* om end */}
+
+<button
+  onClick={() => navigate("/templates")}
+  className="ml-2 mb-4 px-4 py-2 border rounded bg-gray-50"
+>
+  🎨 Templates
+</button>
 
 
         <PersonalInfoForm />
@@ -230,11 +352,13 @@ const handleDownloadPdf = async () => {
       {/* RIGHT SIDE – PREVIEW */}
       <div className="self-start">
         <div className="sticky top-6">
-          <div ref={previewRef}>
+          {/* <div ref={previewRef}>
   <ResumePreview />
-</div>
+</div> */}
+{template === "template1" && <TemplateOne />}
+{template === "template2" && <TemplateTwo />}
+{template === "template3" && <TemplateThree />}
 
-          {/* <ResumePreview /> */}
         </div>
       </div>
     </div>

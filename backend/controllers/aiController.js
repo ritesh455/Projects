@@ -150,7 +150,183 @@ Return ONLY the final rewritten summary.
 `;
 }
 
+//om paste
+const PDFDocument = require("pdfkit");
+// const { rewriteWithAI } = require("../services/geminiService");
 
+/* ===============================
+   PROMPT BUILDER
+   =============================== */
+function buildCoverLetterPrompt(data) {
+  const {
+    name,
+    email,
+    phone,
+    address,
+    recipientName,
+    companyName,
+    companyAddress,
+    keywords,
+  } = data;
+
+  return `
+You are a professional HR assistant.
+
+TASK:
+Write a formal, professional cover letter.
+
+FORMAT INSTRUCTIONS:
+- Start with applicant details
+- Then date
+- Then recipient name and company address
+- Then body paragraphs
+
+APPLICANT DETAILS:
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+Address: ${address}
+
+RECIPIENT DETAILS:
+Recipient Name: ${recipientName}
+Company Name: ${companyName}
+Company Address: ${companyAddress}
+
+CONTENT GUIDELINES:
+${keywords}
+
+RULES:
+- Professional tone
+- Well-structured paragraphs
+- No markdown
+- No bullet points
+- No placeholders
+- Output ONLY the cover letter text
+`;
+}
+
+/* ===============================
+   COVER LETTER GENERATOR
+   =============================== */
+async function generateCoverLetter(req, res) {
+  try {
+    const {
+      name,
+      email,
+      phone,
+      address,
+      recipientName,
+      companyName,
+      companyAddress,
+      keywords,
+    } = req.body;
+
+    if (!name || !keywords) {
+      return res.status(400).json({
+        message: "Required fields missing",
+      });
+    }
+
+    const prompt = buildCoverLetterPrompt({
+      name,
+      email,
+      phone,
+      address,
+      recipientName,
+      companyName,
+      companyAddress,
+      keywords,
+    });
+
+    const coverLetterText = await rewriteWithAI(prompt);
+
+    if (!coverLetterText) {
+      return res.status(500).json({
+        message: "AI returned empty response",
+      });
+    }
+
+    /* ===============================
+       PDF GENERATION
+       =============================== */
+    const doc = new PDFDocument({ margin: 50 });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=cover_letter.pdf"
+    );
+
+    doc.pipe(res);
+
+    /* ---------- HEADER BAR ---------- */
+    doc
+      .rect(0, 0, doc.page.width, 110)
+      .fill("#6B3A1E");
+
+    doc
+      .fillColor("white")
+      .font("Helvetica-Bold")
+      .fontSize(26)
+      .text(name, 50, 40);
+
+    /* ---------- CONTACT ROW ---------- */
+    doc
+      .fillColor("#6B3A1E")
+      .font("Helvetica")
+      .fontSize(10)
+      .text(
+        `${phone}   |   ${address}   |   ${email}`,
+        50,
+        125
+      );
+
+    doc.moveDown(2);
+
+    /* ---------- DATE ---------- */
+    doc
+      .fillColor("black")
+      .fontSize(11)
+      .text(new Date().toDateString());
+
+    doc.moveDown();
+
+    /* ---------- COMPANY DETAILS ---------- */
+    if (recipientName) doc.text(recipientName);
+    if (companyName) doc.text(companyName);
+    if (companyAddress) doc.text(companyAddress);
+
+    doc.moveDown();
+
+    /* ---------- BODY ---------- */
+    doc
+      .fontSize(11)
+      .text(coverLetterText, {
+        align: "left",
+        lineGap: 6,
+      });
+
+    doc.moveDown(2);
+
+    /* ---------- SIGNATURE ---------- */
+    doc.text("Sincerely,");
+    doc.moveDown(0.5);
+
+    doc
+      .fillColor("#6B3A1E")
+      .font("Helvetica-Bold")
+      .fontSize(14)
+      .text(name);
+
+    doc.end();
+  } catch (error) {
+    console.error("Cover Letter AI Error:", error.message);
+    res.status(500).json({
+      message: "Cover letter generation failed",
+    });
+  }
+}
+//om end
 
 async function improveBulletPoint(req, res) {
   try {
@@ -197,4 +373,4 @@ async function improveBulletPoint(req, res) {
   }
 }
 
-module.exports = { improveBulletPoint, buildPrompt };
+module.exports = { improveBulletPoint, buildPrompt, generateCoverLetter };

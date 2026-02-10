@@ -23,6 +23,7 @@ app.post(
 app.use(cors());
 app.use(express.json());
 
+
 /* ===============================
    ROUTES
    =============================== */
@@ -50,4 +51,8 @@ app.get("/", (req, res) => {
   res.send("API running");
 });
 
+/* ===============================
+   Saved Resumes
+   =============================== */
+app.use("/api/saved-resumes", require("./routes/savedResumeRoutes"));
 module.exports = app;

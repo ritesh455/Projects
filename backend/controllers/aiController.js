@@ -150,7 +150,6 @@ Return ONLY the final rewritten summary.
 `;
 }
 
-//om paste
 const PDFDocument = require("pdfkit");
 // const { rewriteWithAI } = require("../services/geminiService");
 
@@ -326,7 +325,7 @@ async function generateCoverLetter(req, res) {
     });
   }
 }
-//om end
+
 
 async function improveBulletPoint(req, res) {
   try {

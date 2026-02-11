@@ -7,7 +7,6 @@
 
 // module.exports = router;
 
-//om paste
 
 const express = require("express");
 const {

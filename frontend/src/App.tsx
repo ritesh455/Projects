@@ -14,14 +14,13 @@ import Register from "./Pages/Register";
 import ResumeBuilder from "./Pages/ResumeBuilder";
 
 import PublicLayout from "./layouts/PublicLayout";
-import PrivateLayout from "./layouts/PrivateLayout";
 
 import ProtectedRoute from "./Pages/ProtectedRoute";
 import GuestRoute from "./Pages/GuestRoute";
 
-//om paste
+
 import SavedResumes from "./Pages/SavedResumes";
-//om end
+
 
 function App() {
   return (
@@ -30,18 +29,17 @@ function App() {
         <TemplateProvider>  
         <ResumeDataProvider>
           <Routes>
-{/* //om paste */}
+
             <Route
   element={
     <ProtectedRoute>
-      <PrivateLayout />
+      <PublicLayout />
     </ProtectedRoute>
   }
 >
   {/* <Route path="/resume-builder" element={<ResumeBuilder />} /> */}
   <Route path="/saved-resumes" element={<SavedResumes />} />
 </Route>
-{/* om end */}
             {/* 🔓 PUBLIC ROUTES */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Home />} />
@@ -65,9 +63,12 @@ function App() {
                   </GuestRoute>
                 }
               />
-            </Route>
 
              <Route path="/payment-success" element={<PaymentSuccess />} />
+
+            </Route>
+
+
 
   <Route
   path="/templates"
@@ -84,7 +85,7 @@ function App() {
             <Route
               element={
                 <ProtectedRoute>
-                  <PrivateLayout />
+                  <PublicLayout />
                 </ProtectedRoute>
               }
             >

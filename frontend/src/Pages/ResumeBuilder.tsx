@@ -18,7 +18,6 @@ import SkillsForm from "../components/form/SkillsForm";
 import EducationForm from "../components/form/EducationForm";
 import ExperienceForm from "../components/form/ExperienceForm";
 import Projects from "../components/form/Projects";
-import ResumePreview from "../components/preview/ResumePreview";
 
 import { useResumeData } from "../context/ResumeContext";
 import { improveAndSaveResume, saveResumeOnly } from "../api/api";
@@ -29,16 +28,34 @@ export default function ResumeBuilder() {
   const [improving, setImproving] = useState(false);
 
   const navigate = useNavigate();
-  //om paste
+
 const [showSaveModal, setShowSaveModal] = useState(false);
 const [saveName, setSaveName] = useState("");
 const [saveDescription, setSaveDescription] = useState("");
 
-  //om end
+
   const { template } = useTemplate();
 
   const previewRef = useRef<HTMLDivElement>(null);
 const { user } = useAuth();
+
+const handleTemplateNavigation = () => {
+  // Not logged in
+  if (!user) {
+    alert("Please login first");
+    return;
+  }
+
+  // Not Pro user
+  if (!user.isPro) {
+    alert("Please activate Pro mode to access Templates");
+    return;
+  }
+
+  // Pro user
+  navigate("/templates");
+};
+
 
 //download PDF handler with pro check
 const handleDownloadPdf = async () => {
@@ -86,7 +103,6 @@ const handleDownloadPdf = async () => {
 
   /* ---------------- ADD HELPERS ---------------- */
 
-  //om paste
   const handleSaveResume = async () => {
   if (!saveName.trim()) {
     alert("Please enter a resume name");
@@ -115,7 +131,6 @@ const handleDownloadPdf = async () => {
     );
   }
 };
-//om end
 
 
 
@@ -226,13 +241,13 @@ const handleDownloadPdf = async () => {
 >
   📄 Download PDF
 </button>
-{/* Pasted by Ritesh */}
 
  <button
         onClick={() => navigate("/cover-letter")}
         style={{
           marginTop: "16px",
-          padding: "10px 16px",
+          marginLeft: "8px",
+          padding: "8px 16px",
           background: "#111",
           color: "#fff",
           borderRadius: "6px",
@@ -241,8 +256,7 @@ const handleDownloadPdf = async () => {
         Generate Cover Letter
       </button>
 
-{/* Pasted end by Ritesh */}
-{/* om paste */}
+
      <button
   onClick={() => setShowSaveModal(true)}
   className="mb-4 ml-2 px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
@@ -292,10 +306,9 @@ const handleDownloadPdf = async () => {
 )}
 
 
-{/* om end */}
 
 <button
-  onClick={() => navigate("/templates")}
+ onClick={handleTemplateNavigation}
   className="ml-2 mb-4 px-4 py-2 border rounded bg-gray-50"
 >
   🎨 Templates

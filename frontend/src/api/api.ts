@@ -81,7 +81,7 @@ export const saveResumeOnly = async (resumeData: any) => {
   return res.data;
 };
 
-// Ritesh Paste
+
 
 export const generateCoverLetterApi = async (data: any) => {
   const res = await API.post(
@@ -96,8 +96,7 @@ export const generateCoverLetterApi = async (data: any) => {
 };
 
 
-// Ritesh end
-// om paste
+
 export const saveResumeVersion = async (data: {
   name: string;
   description?: string;

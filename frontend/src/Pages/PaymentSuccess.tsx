@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import { useAuth } from "../context/AuthContext";
+import { createCheckoutSession } from "../api/api";
 
 export default function PaymentSuccess() {
   const navigate = useNavigate();
@@ -57,10 +58,17 @@ export default function PaymentSuccess() {
         </p>
 
         <button
-          onClick={() => navigate("/resume-builder")}
+          onClick={async () => {
+    try {
+      const data = await createCheckoutSession();
+      window.location.href = data.url; // 🔥 Redirect to Stripe
+    } catch (error) {
+      alert("Failed to start payment process");
+    }
+  }}
           className="px-6 py-3 bg-yellow-500 text-white rounded hover:bg-yellow-600"
         >
-          Go to Resume Builder
+          Activate Pro Model
         </button>
       </div>
     );

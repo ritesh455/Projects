@@ -368,11 +368,13 @@ const handleDownloadPdf = async () => {
           {/* <div ref={previewRef}>
   <ResumePreview />
 </div> */}
-{template === "template1" && <TemplateOne />}
-{template === "template2" && <TemplateTwo />}
-{template === "template3" && <TemplateThree />}
+  <div ref={previewRef}>
+    {template === "template1" && <TemplateOne />}
+    {template === "template2" && <TemplateTwo />}
+    {template === "template3" && <TemplateThree />}
+  </div>
+</div>
 
-        </div>
       </div>
     </div>
   );
